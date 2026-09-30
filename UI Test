@@ -1,17 +1,25 @@
---// AUTO FISHING UI - UI ONLY
+```lua
+--// AUTO FISHING UI
+--// Drag + Minimize + Toggle Keybind
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 
---// ScreenGui
+--==================================================
+-- SCREEN GUI
+--==================================================
+
 local gui = Instance.new("ScreenGui")
 gui.Name = "FishingUI"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
---// Main
+--==================================================
+-- MAIN
+--==================================================
+
 local Main = Instance.new("Frame")
 Main.Size = UDim2.fromOffset(360, 300)
 Main.Position = UDim2.new(0.5, -180, 0.5, -150)
@@ -23,9 +31,17 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 12)
 MainCorner.Parent = Main
 
---// Title
+--==================================================
+-- TITLE BAR
+--==================================================
+
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 45)
+TitleBar.BackgroundTransparency = 1
+TitleBar.Parent = Main
+
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -50, 0, 45)
+Title.Size = UDim2.new(1, -100, 1, 0)
 Title.Position = UDim2.fromOffset(18, 0)
 Title.BackgroundTransparency = 1
 Title.Text = "AUTO FISHING"
@@ -33,9 +49,26 @@ Title.TextColor3 = Color3.fromRGB(240, 240, 245)
 Title.TextSize = 17
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Parent = Main
+Title.Parent = TitleBar
 
---// Close
+--==================================================
+-- MINIMIZE BUTTON
+--==================================================
+
+local Minimize = Instance.new("TextButton")
+Minimize.Size = UDim2.fromOffset(35, 35)
+Minimize.Position = UDim2.new(1, -78, 0, 5)
+Minimize.BackgroundTransparency = 1
+Minimize.Text = "−"
+Minimize.TextColor3 = Color3.fromRGB(180, 180, 190)
+Minimize.TextSize = 25
+Minimize.Font = Enum.Font.Gotham
+Minimize.Parent = TitleBar
+
+--==================================================
+-- CLOSE BUTTON
+--==================================================
+
 local Close = Instance.new("TextButton")
 Close.Size = UDim2.fromOffset(35, 35)
 Close.Position = UDim2.new(1, -42, 0, 5)
@@ -44,13 +77,16 @@ Close.Text = "×"
 Close.TextColor3 = Color3.fromRGB(180, 180, 190)
 Close.TextSize = 25
 Close.Font = Enum.Font.Gotham
-Close.Parent = Main
+Close.Parent = TitleBar
 
 Close.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
---// Content
+--==================================================
+-- CONTENT
+--==================================================
+
 local Content = Instance.new("Frame")
 Content.Size = UDim2.new(1, -30, 1, -60)
 Content.Position = UDim2.fromOffset(15, 50)
@@ -62,12 +98,12 @@ Layout.Padding = UDim.new(0, 8)
 Layout.SortOrder = Enum.SortOrder.LayoutOrder
 Layout.Parent = Content
 
-
 --==================================================
 -- SWITCH
 --==================================================
 
 local function CreateSwitch(text, default)
+
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, 0, 0, 38)
     holder.BackgroundTransparency = 1
@@ -107,35 +143,46 @@ local function CreateSwitch(text, default)
     local enabled = default or false
 
     local function update()
+
         if enabled then
+
             button.BackgroundColor3 = Color3.fromRGB(90, 150, 255)
             knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             knob.Position = UDim2.new(1, -21, 0, 3)
+
         else
+
             button.BackgroundColor3 = Color3.fromRGB(55, 57, 65)
             knob.BackgroundColor3 = Color3.fromRGB(160, 160, 170)
             knob.Position = UDim2.fromOffset(3, 3)
+
         end
+
     end
 
     button.MouseButton1Click:Connect(function()
+
         enabled = not enabled
         update()
+
     end)
 
     update()
 
     return {
+
         Get = function()
             return enabled
         end,
+
         Set = function(value)
             enabled = value
             update()
         end
-    }
-end
 
+    }
+
+end
 
 --==================================================
 -- DROPDOWN
@@ -144,6 +191,7 @@ end
 local openedDropdown = nil
 
 local function CreateDropdown(text, options, default)
+
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, 0, 0, 38)
     holder.BackgroundTransparency = 1
@@ -212,15 +260,18 @@ local function CreateDropdown(text, options, default)
     listLayout.Parent = list
 
     local function close()
+
         list.Visible = false
         arrow.Text = "▼"
 
         if openedDropdown == list then
             openedDropdown = nil
         end
+
     end
 
     for _, option in ipairs(options) do
+
         local item = Instance.new("TextButton")
         item.Size = UDim2.new(1, 0, 0, 30)
         item.BackgroundTransparency = 1
@@ -232,12 +283,16 @@ local function CreateDropdown(text, options, default)
         item.Parent = list
 
         item.MouseButton1Click:Connect(function()
+
             selected.Text = option
             close()
+
         end)
+
     end
 
     dropdown.MouseButton1Click:Connect(function()
+
         if openedDropdown and openedDropdown ~= list then
             openedDropdown.Visible = false
         end
@@ -251,21 +306,26 @@ local function CreateDropdown(text, options, default)
             openedDropdown = nil
             arrow.Text = "▼"
         end
+
     end)
 
     return {
+
         Get = function()
             return selected.Text
         end,
 
         Set = function(value)
+
             if table.find(options, value) then
                 selected.Text = value
             end
-        end
-    }
-end
 
+        end
+
+    }
+
+end
 
 --==================================================
 -- CONTROLS
@@ -291,8 +351,38 @@ local AutoCraft = CreateDropdown(
     "LEGEND"
 )
 
-local AutoStorage = CreateSwitch("Auto Storage Fruit", false)
+local AutoStorage = CreateSwitch(
+    "Auto Storage Fruit",
+    false
+)
 
+--==================================================
+-- MINIMIZE
+--==================================================
+
+local minimized = false
+local normalSize = UDim2.fromOffset(360, 300)
+local minimizedSize = UDim2.fromOffset(360, 45)
+
+Minimize.MouseButton1Click:Connect(function()
+
+    minimized = not minimized
+
+    if minimized then
+
+        Main.Size = minimizedSize
+        Content.Visible = false
+        Minimize.Text = "+"
+
+    else
+
+        Main.Size = normalSize
+        Content.Visible = true
+        Minimize.Text = "−"
+
+    end
+
+end)
 
 --==================================================
 -- DRAG UI
@@ -302,16 +392,22 @@ local dragging = false
 local dragStart
 local startPosition
 
-Title.InputBegan:Connect(function(input)
+TitleBar.InputBegan:Connect(function(input)
+
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
         dragging = true
         dragStart = input.Position
         startPosition = Main.Position
+
     end
+
 end)
 
 UIS.InputChanged:Connect(function(input)
+
     if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+
         local delta = input.Position - dragStart
 
         Main.Position = UDim2.new(
@@ -320,11 +416,39 @@ UIS.InputChanged:Connect(function(input)
             startPosition.Y.Scale,
             startPosition.Y.Offset + delta.Y
         )
+
     end
+
 end)
 
 UIS.InputEnded:Connect(function(input)
+
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
     end
+
 end)
+
+--==================================================
+-- KEYBIND
+--==================================================
+
+local ToggleKey = Enum.KeyCode.RightShift
+
+UIS.InputBegan:Connect(function(input, gameProcessed)
+
+    if gameProcessed then
+        return
+    end
+
+    if input.KeyCode == ToggleKey then
+
+        Main.Visible = not Main.Visible
+
+    end
+
+end)
+
+print("Fishing UI Loaded")
+print("Toggle UI: RightShift")
+```
